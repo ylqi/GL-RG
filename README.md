@@ -37,7 +37,7 @@ git clone --recursive https://github.com/ylqi/GL-RG.git
 
 Check out the `coco-caption/`,  `cider/`,  `data/` and `model/` projects into your working directory. If not, please find detailed steps [INSTALL.md](docs/INSTALL.md) for installation and dataset preparation.
 
-Then, please run following script to download [Stanford CoreNLP 3.6.0](http://stanfordnlp.github.io/CoreNLP/index.html) models to `coco-caption/`:
+Then, please run following script to download [Stanford CoreNLP 3.6.0](http://stanfordnlp.github.io/CoreNLP/index.html) models into `coco-caption/`:
 
 ```bash
 cd coco-caption
