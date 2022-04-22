@@ -17,7 +17,7 @@ The code of IJCAI22 paper *"GL-RG: Global-Local Representation Granularity for V
 * [CIDEr](https://github.com/plsang/cider)
 * numpy, scikit-image, h5py, requests 
 
-This repo was tested with Python 2.7, [PyTorch](https://pytorch.org) 1.0.1 (and 0.2.0), [cuDNN](https://developer.nvidia.com/cudnn) 10.0 (and 6.0), with [CUDA](https://developer.nvidia.com/cuda-toolkit) 8.0. But it should be runnable with more recent PyTorch>=1.0 (or >=0.2, <=1.0) versions.
+This repo was tested with Python 2.7, [PyTorch](https://pytorch.org) 1.0.1 (or 0.2.0), [cuDNN](https://developer.nvidia.com/cudnn) 10.0 (or 6.0), with [CUDA](https://developer.nvidia.com/cuda-toolkit) 8.0. But it should be runnable with more recent PyTorch>=1.0 (or >=0.2, <=1.0) versions.
 
 You can use anaconda or miniconda to install the dependencies:
 ```bash
@@ -37,7 +37,7 @@ git clone --recursive https://github.com/ylqi/GL-RG.git
 
 Check out the `coco-caption/`,  `cider/`,  `data/` and `model/` projects into your working directory. If not, please find detailed steps [INSTALL.md](docs/INSTALL.md) for installation and dataset preparation.
 
-Please run following script to download [Stanford CoreNLP 3.6.0](http://stanfordnlp.github.io/CoreNLP/index.html) models to `coco-caption/`:
+Then, please run following script to download [Stanford CoreNLP 3.6.0](http://stanfordnlp.github.io/CoreNLP/index.html) models to `coco-caption/`:
 
 ```bash
 cd coco-caption
