@@ -3,7 +3,7 @@
 func_training_xe()
 {
     MODEL_NAME=GL-RG
-    DATASET="msrvtt"
+    DATASET="msrvtt"  # Choices: [msrvtt, msvd]
     CKPT_NAME=XE
     CKPT_DIR=output/${MODEL_NAME}_${CKPT_NAME}_${DATASET}
 	mkdir -p ${CKPT_DIR}
@@ -40,7 +40,7 @@ func_training_xe()
 func_training_dxe()
 {
     MODEL_NAME=GL-RG
-    DATASET="msvd"
+    DATASET="msrvtt"  # Choices: [msrvtt, msvd]
     CKPT_NAME=DXE
     CKPT_DIR=output/${MODEL_NAME}_${CKPT_NAME}_${DATASET}
 	mkdir -p ${CKPT_DIR}
@@ -77,7 +77,7 @@ func_training_dxe()
 func_training_rl_scst()
 {
     MODEL_NAME=GL-RG
-    DATASET="msvd"
+    DATASET="msrvtt"  # Choices: [msrvtt, msvd]
     CKPT_NAME=RL
     CKPT_DIR=output/${MODEL_NAME}_${CKPT_NAME}_${DATASET}
 	mkdir -p ${CKPT_DIR}
@@ -114,7 +114,7 @@ func_training_rl_scst()
 func_training_it_dr_b1()
 {
     MODEL_NAME=GL-RG
-    DATASET="msvd"
+    DATASET="msrvtt"  # Choices: [msrvtt, msvd]
     CKPT_NAME=DR
     CKPT_DIR=output/${MODEL_NAME}_${CKPT_NAME}_${DATASET}
 	mkdir -p ${CKPT_DIR}
@@ -152,7 +152,7 @@ func_training_it_dr_b1()
 func_training_it_dr_b2()
 {
     MODEL_NAME=GL-RG
-    DATASET="msvd"
+    DATASET="msrvtt"  # Choices: [msrvtt, msvd]
     CKPT_NAME=DR
     CKPT_DIR=output/${MODEL_NAME}_${CKPT_NAME}_${DATASET}
 	mkdir -p ${CKPT_DIR}
