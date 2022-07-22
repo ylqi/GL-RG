@@ -21,12 +21,14 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+
 def progress_bar(some_iter):
     try:
         from tqdm import tqdm
         return tqdm(some_iter)
     except ModuleNotFoundError:
         return some_iter
+
 
 def download_file_from_google_drive(file_id, destination):
     print("Trying to fetch {}".format(destination))
@@ -65,6 +67,7 @@ ID_DICT = {'GL-RG_XE_msrvtt': '1xaAW-hUbOiXv5kdMxO-gCLAgl-wkre8q',
            'GL-RG_XE_msvd': '1J4-I9bf2nB1_HlOLNq8aUpLfuSRvTlq3',
            'GL-RG_DXE_msvd': '1HixyH_LOT-3HtcsehQT_c9PAlPwFCTd-',
            'GL-RG_DR_msvd': '1cCisyMpp1mUS9NQPHSn4iCiVmqMfJeL5'}
+
 
 if __name__ == '__main__':
 

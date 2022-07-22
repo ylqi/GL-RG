@@ -47,8 +47,7 @@ class DataLoader():
         self.num_videos = len(self.videos)
         self.index = range(self.num_videos)
 
-        # load the json file which contains additional information about the
-        # dataset
+        # load the json file which contains additional information about the dataset
         self.feat_h5_files = opt['feat_h5']
         logger.info('DataLoader loading h5 files: %s', self.feat_h5_files)
         if self.use_resnet_feature == 1:
@@ -57,7 +56,6 @@ class DataLoader():
             self.feat_h5_c3d = h5py.File(self.feat_h5_files[1], 'r')
         if self.use_audio_feature == 1:
             self.feat_h5_aud = h5py.File(self.feat_h5_files[2], 'r')
-        #self.feat_h5_cls = h5py.File(self.feat_h5_files[3], 'r')
         if self.use_global_local_feature == 1:
             self.feat_h5_gl = h5py.File(self.feat_h5_files[3], 'r')
 
@@ -71,14 +69,12 @@ class DataLoader():
         if self.use_global_local_feature == 1:
             self.feat_dim_gl = self.feat_h5_gl[self.videos[0]].shape[0] if 'mp1' in self.feat_h5_files[3] else self.feat_h5_gl['feats'][0].shape[0]
 
-        #self.feat_dim_cls = self.feat_h5_cls[self.videos[0]].shape[0]
         if self.use_resnet_feature == 1:
             self.feat_dims.append(self.feat_dim_res)
         if self.use_c3d_feature == 1:
             self.feat_dims.append(self.feat_dim_c3d)
         if self.use_audio_feature == 1:
             self.feat_dims.append(self.feat_dim_aud)
-        #self.feat_dims.append(self.feat_dim_cls)
         if self.use_global_local_feature == 1:
             self.feat_dims.append(self.feat_dim_gl)
 
@@ -123,7 +119,6 @@ class DataLoader():
             self.feat_h5_c3d.close()
         if self.use_audio_feature == 1:
             self.feat_h5_aud.close()
-        #self.feat_h5_cls.close()
         if self.use_global_local_feature == 1:
             self.feat_h5_gl.close()
 
@@ -157,7 +152,6 @@ class DataLoader():
             video_batch_c3d = torch.FloatTensor(self.batch_size, self.num_chunks, self.feat_dim_c3d).zero_()
         if self.use_audio_feature == 1:
             video_batch_aud = torch.FloatTensor(self.batch_size, self.num_chunks, self.feat_dim_aud).zero_()
-        #video_batch_cls = torch.FloatTensor(self.batch_size, self.num_chunks, self.feat_dim_cls).zero_()
         if self.use_global_local_feature == 1:
             video_batch_gl = torch.FloatTensor(self.batch_size, self.num_chunks, self.feat_dim_gl).zero_()
 
@@ -167,7 +161,6 @@ class DataLoader():
             video_batchs.append(video_batch_c3d)
         if self.use_audio_feature == 1:
             video_batchs.append(video_batch_aud)
-        #video_batchs.append(video_batch_cls)
         if self.use_global_local_feature == 1:
             video_batchs.append(video_batch_gl)
 
@@ -214,14 +207,6 @@ class DataLoader():
                 else:
                     video_batchs[feat_idx][ii] = torch.from_numpy(np.array(self.feat_h5_gl['feats'][self.update_index(video_id, self.feat_h5_files[3])]))
                 feat_idx += 1
-
-
-            '''
-            if 'mp1' in self.feat_h5_files[3]:
-                video_batchs[3][ii] = torch.from_numpy(np.array(self.feat_h5_cls[str(video_id)]))
-            else:
-                video_batchs[3][ii] = torch.from_numpy(np.array(self.feat_h5_cls[str(video_id)]))
-            '''
 
             if self.has_label:
                 # fetch the sequence labels

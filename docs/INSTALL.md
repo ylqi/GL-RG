@@ -10,13 +10,6 @@ Please run following script to download evaluation codes for [Microsoft COCO Cap
 cd GL-RG
 git clone https://github.com/tylin/coco-caption.git
 ```
-Then, please run following script to download [Stanford CoreNLP 3.6.0](http://stanfordnlp.github.io/CoreNLP/index.html) models into `coco-caption/`:
-
-```bash
-cd coco-caption
-./get_stanford_models.sh
-```
-
 Please refer to [Microsoft COCO Caption Evaluation](https://github.com/tylin/coco-caption) for more setup details.
 
 ### CIDEr Code

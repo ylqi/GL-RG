@@ -17,11 +17,18 @@ The code of IJCAI22 paper *"GL-RG: Global-Local Representation Granularity for V
 * [CIDEr](https://github.com/plsang/cider)
 * numpy, scikit-image, h5py, requests 
 
-This repo was tested with Python 2.7, [PyTorch](https://pytorch.org) 1.0.1 (or 0.2.0), [cuDNN](https://developer.nvidia.com/cudnn) 10.0 (or 6.0), with [CUDA](https://developer.nvidia.com/cuda-toolkit) 8.0. But it should be runnable with more recent PyTorch>=1.0 (or >=0.2, <=1.0) versions.
+This repo was tested with Python 2.7, [PyTorch](https://pytorch.org) 1.0.1 (or 0.2.0), [cuDNN](https://developer.nvidia.com/cudnn) 10.0 (or 6.0), with [CUDA](https://developer.nvidia.com/cuda-toolkit) 8.0. But it should be runnable with more recent [PyTorch](https://pytorch.org)>=1.0 (or >=0.2, <=1.0) versions.
 
 You can use anaconda or miniconda to install the dependencies:
 ```bash
 conda create -n GL-RG-pytorch python=2.7 pytorch=1.0 scikit-image h5py requests
+conda activate GL-RG-pytorch
+```
+
+Or you can install the dependencies following this script:
+
+```ba
+conda env create -f environment.yaml
 conda activate GL-RG-pytorch
 ```
 

@@ -8,7 +8,6 @@ DATASET=msvd        # Choices: [msrvtt, msvd]
 
 MODEL_DIR=model     # Choices: [model, output]
 
-
 if [ "$DATASET" == "msvd" ]; then 
     SEQ_PER_IMG=17
 else
