@@ -36,6 +36,10 @@ class DataLoader():
         self.use_global_local_feature = opt.get('use_global_local_feature', 0)
         self.use_resnet_feature = opt.get('use_resnet_feature', 0)
 
+        self.use_long_range = opt.get('use_long_range', 0)
+        self.use_short_range = opt.get('use_short_range', 0)
+        self.use_local = opt.get('use_local', 0)
+
         # open the hdf5 info file
         logger.info('DataLoader loading h5 file: %s', opt['label_h5'])
         self.label_h5 = h5py.File(opt['label_h5'], 'r')
@@ -67,7 +71,14 @@ class DataLoader():
         if self.use_audio_feature == 1:
             self.feat_dim_aud = self.feat_h5_aud[self.videos[0]].shape[0] if 'mp1' in self.feat_h5_files[2] else self.feat_h5_aud['feats'][0].shape[0]
         if self.use_global_local_feature == 1:
-            self.feat_dim_gl = self.feat_h5_gl[self.videos[0]].shape[0] if 'mp1' in self.feat_h5_files[3] else self.feat_h5_gl['feats'][0].shape[0]
+            # self.feat_dim_gl = self.feat_h5_gl[self.videos[0]].shape[0] if 'mp1' in self.feat_h5_files[3] else self.feat_h5_gl['feats'][0].shape[0]
+            self.feat_dim_gl = 0
+            if self.use_long_range:
+                self.feat_dim_gl += 300
+            if self.use_short_range:
+                self.feat_dim_gl += 400
+            if self.use_local:
+                self.feat_dim_gl += 1000
 
         if self.use_resnet_feature == 1:
             self.feat_dims.append(self.feat_dim_res)
@@ -203,10 +214,25 @@ class DataLoader():
 
             if self.use_global_local_feature == 1:
                 if 'mp1' in self.feat_h5_files[3]:
-                    video_batchs[feat_idx][ii] = torch.from_numpy(np.array(self.feat_h5_gl[str(video_id)]))
+                    loaded_data = torch.from_numpy(np.array(self.feat_h5_gl[str(video_id)]))
                 else:
-                    video_batchs[feat_idx][ii] = torch.from_numpy(np.array(self.feat_h5_gl['feats'][self.update_index(video_id, self.feat_h5_files[3])]))
+                    loaded_data = torch.from_numpy(np.array(self.feat_h5_gl['feats'][self.update_index(video_id, self.feat_h5_files[3])]))
+
+                global_local_feature = torch.FloatTensor([])
+
+                if self.use_long_range:
+                    global_local_feature = torch.cat((global_local_feature, loaded_data[:300]), -1)
+
+                if self.use_short_range:
+                    global_local_feature = torch.cat((global_local_feature, loaded_data[300:(300+400)]), -1)
+
+                if self.use_local:
+                    global_local_feature = torch.cat((global_local_feature, loaded_data[(300+400):(300+400+1000)]), -1)
+
+                video_batchs[feat_idx][ii] = global_local_feature
+
                 feat_idx += 1
+
 
             if self.has_label:
                 # fetch the sequence labels
