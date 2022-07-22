@@ -25,7 +25,7 @@ conda create -n GL-RG-pytorch python=2.7 pytorch=1.0 scikit-image h5py requests
 conda activate GL-RG-pytorch
 ```
 
-Or you can install the dependencies following this script:
+or you can install the dependencies following this script:
 
 ```ba
 conda env create -f environment.yaml
