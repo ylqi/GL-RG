@@ -2,6 +2,8 @@ import sys
 import os
 import json
 
+import cPickle
+
 import numpy as np
 from collections import OrderedDict
 
@@ -16,7 +18,154 @@ from pycocoevalcap.bleu.bleu import Bleu
 from pycocoevalcap.rouge.rouge import Rouge
 from pycocoevalcap.meteor.meteor import Meteor
 
-import cPickle
+
+def get_discriminative_cross_entropy_scores(model_res, bcmrscores=None):
+    """
+    Arguments:
+        bcmrscores: precomputed scores (BLEU, CIDEr, METEOR, ROUGE_L) of GT sequences
+    """
+    
+    scores = bcmrscores.copy()
+
+    m_score = np.mean(scores)
+    b_score = 0
+
+    scores = scores.reshape(-1)
+    rewards = np.repeat(scores[:, np.newaxis], model_res.shape[1], 1)
+
+    return rewards, m_score, b_score
+
+
+def get_self_critical_reward(model_res, scst_res, data_gts, bcmr_scorer, expand_feat=0, seq_per_img=20, use_eos=0):
+    """
+    SCST baseline:
+        Self-critical Sequence Training for Image Captioning (CVPR'17) 
+        Paper: https://arxiv.org/pdf/1612.00563.pdf
+    """
+    batch_size = model_res.size(0)
+
+    model_res = model_res.cpu().numpy()
+    scst_res = scst_res.cpu().numpy()
+
+    res = OrderedDict()
+    for i in range(batch_size):
+        res[i] = [array_to_str(model_res[i], use_eos)]
+    for i in range(batch_size):
+        res[batch_size + i] = [array_to_str(scst_res[i], use_eos)]
+
+    gts = OrderedDict()
+    for i in range(len(data_gts)):
+        gts[i] = [array_to_str(data_gts[i][j], use_eos) for j in range(len(data_gts[i]))]
+
+    if isinstance(bcmr_scorer, CiderD):
+        res = [{'image_id': i, 'caption': res[i]} for i in range(2 * batch_size)]
+
+    if expand_feat == 1:
+        gts = {i: gts[(i % batch_size) // seq_per_img] for i in range(2 * batch_size)}
+    else:
+        gts = {i: gts[i % batch_size] for i in range(2 * batch_size)}
+
+    score, scores = bcmr_scorer.compute_score(gts, res)
+
+    # if bleu, only use bleu_4
+    if isinstance(bcmr_scorer, Bleu):
+        score = score[-1]
+        scores = scores[-1]
+
+    # happens for BLEU and METEOR
+    if type(scores) == list:
+        scores = np.array(scores)
+
+    m_score = np.mean(scores[:batch_size])
+    g_score = np.mean(scores[batch_size:])
+
+    scores = scores[:batch_size] - scores[batch_size:]
+
+    rewards = np.repeat(scores[:, np.newaxis], model_res.shape[1], 1)
+
+    return rewards, m_score, g_score
+
+
+def get_discrepant_reward(model_res, data_gts, bcmr_scorer, bcmrscores=None, expand_feat=0, seq_per_img=20, dr_baseline_captions=20, dr_baseline_type=1, use_eos=0, use_mixer=0):
+    """
+    Arguments:
+        bcmrscores: precomputed scores (BLEU, CIDEr, METEOR, ROUGE_L) of GT sequences
+        dr_baseline_type: 1 - use GT sentences to compute baseline, 
+                          2 - use sampled sentences to compute baseline.
+    """
+
+    if bcmrscores is None or use_mixer == 1:
+        batch_size = model_res.size(0)
+
+        model_res = model_res.cpu().numpy()
+
+        res = OrderedDict()
+        for i in range(batch_size):
+            res[i] = [array_to_str(model_res[i], use_eos)]
+
+        gts = OrderedDict()
+        for i in range(len(data_gts)):
+            gts[i] = [array_to_str(data_gts[i][j], use_eos) for j in range(len(data_gts[i]))]
+
+        if isinstance(bcmr_scorer, CiderD):
+            res = [{'image_id': i, 'caption': res[i]} for i in range(batch_size)]
+
+        if expand_feat == 1:
+            gts = {i: gts[(i % batch_size) // seq_per_img] for i in range(batch_size)}
+        else:
+            gts = {i: gts[i % batch_size] for i in range(batch_size)}
+
+        _, scores = bcmr_scorer.compute_score(gts, res)
+
+        # if bleu, only use bleu_4
+        if isinstance(bcmr_scorer, Bleu):
+            scores = scores[-1]
+
+        # happens for BLEU and METEOR
+        if type(scores) == list:
+            scores = np.array(scores)
+
+        scores = scores.reshape(-1, seq_per_img)
+
+    elif bcmrscores is not None and use_mixer == 0:
+        # use pre-computed scores only when mixer is not used
+        scores = bcmrscores.copy()
+    else:
+        raise ValueError('bcmrscores is not set when mixer is not used!')
+
+    if dr_baseline_captions > 0:
+
+        sorted_scores = np.sort(scores, axis=1)
+
+        if dr_baseline_type == 1:
+            # compute baseline from GT scores
+            sorted_bcmrscores = np.sort(bcmrscores, axis=1)
+            m_score = np.mean(scores)
+            b_score = np.mean(bcmrscores)
+        elif dr_baseline_type == 2:
+            # compute baseline from sampled scores
+            m_score = np.mean(sorted_scores)
+            b_score = np.mean(sorted_scores[:, :dr_baseline_captions])
+        else:
+            raise ValueError('unknown dr_baseline_type!')
+
+        for ii in range(scores.shape[0]):
+            if dr_baseline_type == 1:
+                b = np.mean(sorted_bcmrscores[ii, :dr_baseline_captions])
+            elif dr_baseline_type == 2:
+                b = np.mean(sorted_scores[ii, :dr_baseline_captions])
+            else:
+                b = 0
+            scores[ii] = scores[ii] - b
+
+    else:
+        m_score = np.mean(scores)
+        b_score = 0
+
+    scores = scores.reshape(-1)
+    rewards = np.repeat(scores[:, np.newaxis], model_res.shape[1], 1)
+
+    return rewards, m_score, b_score
 
 
 def adjust_learning_rate(opt, optimizer, epoch):
@@ -61,14 +210,12 @@ def load_gt_refs(cocofmt_file):
 
 def compute_score(gt_refs, predictions, scorer):
     # use with standard package https://github.com/tylin/coco-caption
-    # hypo = {p['image_id']: [p['caption']] for p in predictions}
 
-    # use with Cider provided by https://github.com/ruotianluo/cider
+    # use with CIDEr provided by https://github.com/ruotianluo/cider
     hypo = [{'image_id': p['image_id'], 'caption': [p['caption']]}
             for p in predictions]
 
-    # standard package requires ref and hypo have same keys, i.e., ref.keys()
-    # == hypo.keys()
+    # standard package requires ref and hypo have same keys, i.e., ref.keys() == hypo.keys()
     ref = {p['image_id']: gt_refs[p['image_id']] for p in predictions}
 
     score, scores = scorer.compute_score(ref, hypo)
@@ -152,3 +299,4 @@ def array_to_str(arr, use_eos=0):
             break
 
     return out.strip()
+

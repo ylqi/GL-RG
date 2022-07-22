@@ -232,7 +232,7 @@ class CaptionModel(nn.Module):
 
         self.use_resnet_feature = opt.use_resnet_feature
         self.use_c3d_feature = opt.use_c3d_feature
-        self.use_sem_tag_feature = opt.use_sem_tag_feature
+        self.use_global_local_feature = opt.use_global_local_feature
 
         self.embed = nn.Embedding(self.vocab_size, self.input_encoding_size)
         self.logit = nn.Linear(self.rnn_size, self.vocab_size)

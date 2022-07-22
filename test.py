@@ -94,7 +94,7 @@ if __name__ == '__main__':
                 'use_resnet_feature': opt.use_resnet_feature,
                 'use_c3d_feature': opt.use_c3d_feature,
                 'use_audio_feature': opt.use_audio_feature,
-                'use_sem_tag_feature': opt.use_sem_tag_feature,
+                'use_global_local_feature': opt.use_global_local_feature,
                 'use_long_range': opt.use_long_range,
                 'use_short_range': opt.use_short_range,
                 'use_local': opt.use_local,
@@ -104,7 +104,8 @@ if __name__ == '__main__':
     test_loader = DataLoader(test_opt)
 
     if not os.path.exists(opt.model_file):
-        logger.info('downloading model: %s', opt.model_file)
+        logger.info('cannot find model in path: %s ', opt.model_file)
+        logger.info('downloading model into %s', opt.model_file)
         model_name = opt.model_file.split('/')[-2]
         model_dir = os.path.dirname(opt.model_file)
         if not os.path.exists(model_dir):

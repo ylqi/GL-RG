@@ -16,7 +16,7 @@ def parse_opts():
     parser.add_argument('--test_cocofmt_file', type=str, help='Gold captions in MSCOCO format to cal language metrics')
     parser.add_argument('--train_bcmrscores_pkl', type=str, help='Pre-computed Cider-D metric for all captions')
     # Optimization: General
-    parser.add_argument('--max_patience', type=int, default=5, help='max number of epoch to run since the minima is detected -- early stopping')
+    parser.add_argument('--max_patience', type=int, default=100, help='max number of epoch to run since the minima is detected -- early stopping')
     parser.add_argument('--batch_size', type=int, default=128, help='Video batch size (there will be x seq_per_img sentences)')
     parser.add_argument('--test_batch_size', type=int, default=32, help='what is the batch size in number of images per batch? (there will be x seq_per_img sentences)')
     parser.add_argument('--train_seq_per_img', type=int, default=20, help='number of captions to sample for each image during training. Done for efficiency since CNN forward pass is expensive.')
@@ -39,8 +39,9 @@ def parse_opts():
     # Evaluation/Checkpointing
     parser.add_argument('--save_checkpoint_from', type=int, default=20, help='Start saving checkpoint from this epoch')
     parser.add_argument('--save_checkpoint_every', type=int, default=1, help='how often to save a model checkpoint in epochs?')
+    parser.add_argument('--use_dxe', type=int, default=0, help='Use DXE training or not')
     parser.add_argument('--use_rl', type=int, default=0, help='Use RL training or not')
-    parser.add_argument('--use_rl_after', type=int, default=30, help='Start RL training after this epoch')
+    parser.add_argument('--use_rl_after', type=int, default=0, help='Start RL training after this epoch')
     parser.add_argument('--train_cached_tokens', type=str, default=30, help='Path to idx document frequencies to cal Cider on training data')
     parser.add_argument('--expand_feat', type=int, default=1, help='To expand features when sampling (to multiple captions)')
     parser.add_argument('--model_file', type=str, help='output model file')
@@ -61,23 +62,28 @@ def parse_opts():
     parser.add_argument('--use_ss', type=int, default=0, help='Use schedule sampling')
     parser.add_argument('--use_ss_after', type=int, default=0, help='Use schedule sampling after this epoch')
     parser.add_argument('--ss_max_prob', type=float, default=0.25, help='Use schedule sampling')
-    parser.add_argument('--ss_k', type=float, default=30.0, help='plot k/(k+exp(x/k)) from x=0 to 400, k=30')
+    parser.add_argument('--ss_k', type=float, default=100.0, help='plot k/(k+exp(x/k)) from x=0 to 400, k=30')
     parser.add_argument('--use_mixer', type=int, default=1, help='Use schedule sampling')
     parser.add_argument('--mixer_from', type=int, default=-1, help='If -1, then an annealing scheme will be used, based on mixer_descrease_every. \
                                                                     Initially it will set to the max_seq_length (30), and will be gradually descreased to 1. \
                                                                     If this value is set to 1 from the begininig, then the MIXER approach is not applied')
     parser.add_argument('--mixer_descrease_every', type=int, default=2, help='Epoch interval to descrease mixing value')
+    parser.add_argument('--use_it', type=int, default=0, help='Use Incremental Training')
+    parser.add_argument('--use_it_after', type=int, default=0, help='Start Incremental Training after this epoch')
+    parser.add_argument('--dr_increase_every', type=int, default=5, help='Epoch interval to increase DR baseline')
+    parser.add_argument('--dr_baseline_type', type=int, default=1, help='which discrepant reward baseline to use? 1: GT sentences, 2: Sampled sentences')
+    parser.add_argument('--dr_baseline_captions', type=int, default=20, help='-1: annealing, otherwise using this fixed number to be the number of captions to compute baseline')
     parser.add_argument('--use_eos', type=int, default=0, help='If 1, keep <EOS> in captions of the reference set')
     parser.add_argument('--output_logp', type=int, default=0, help='Output average log likehood of the test and GT captions. Used for robustness analysis at test time.')
 
-    parser.add_argument('--use_resnet_feature', type=int, default=1, help=' If 1, then use resnet feature')
-    parser.add_argument('--use_c3d_feature', type=int, default=1, help=' If 1, then use c3d feature')
-    parser.add_argument('--use_audio_feature', type=int, default=1, help=' If 1, then use c3d feature')
-    parser.add_argument('--use_sem_tag_feature', type=int, default=0, help=' If 1, then use semantic feature and classifaction feature')
+    parser.add_argument('--use_resnet_feature', type=int, default=0, help=' If 1, then use resnet feature')
+    parser.add_argument('--use_c3d_feature', type=int, default=0, help=' If 1, then use c3d feature')
+    parser.add_argument('--use_audio_feature', type=int, default=0, help=' If 1, then use c3d feature')
+    parser.add_argument('--use_global_local_feature', type=int, default=1, help=' If 1, then use global-local feature')
 
-    parser.add_argument('--use_long_range', type=int, default=0, help=' If 1, then use long range feature')
-    parser.add_argument('--use_short_range', type=int, default=0, help=' If 1, then use short range feature')
-    parser.add_argument('--use_local', type=int, default=0, help=' If 1, then use local keyframe feature')
+    parser.add_argument('--use_long_range', type=int, default=1, help=' If 1, then use long range feature')
+    parser.add_argument('--use_short_range', type=int, default=1, help=' If 1, then use short range feature')
+    parser.add_argument('--use_local', type=int, default=1, help=' If 1, then use local keyframe feature')
 
     args = parser.parse_args()
     return args

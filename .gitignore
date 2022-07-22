@@ -1,2 +1,4 @@
 /model/*/*.json
 *.pyc
+/output/
+__pycache__
