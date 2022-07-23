@@ -3,8 +3,9 @@
 ![PyTorch 1.6.0](https://img.shields.io/badge/pytorch-1.0.1-green.svg)
 ![License MIT](https://badgen.net/badge/license/MIT/blue)
 ![docs](https://img.shields.io/badge/docs-latest-blue)
-![Github stars](https://img.shields.io/github/stars/ylqi/GL-RG.svg)
 ![issues](https://img.shields.io/github/issues/ylqi/GL-RG.svg)
+![Github stars](https://img.shields.io/github/stars/ylqi/GL-RG.svg)
+
 ![framework.png](Figs/framework.png)
 
 The code of IJCAI22 paper *"GL-RG: Global-Local Representation Granularity for Video Captioning"*. 
