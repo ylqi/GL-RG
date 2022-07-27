@@ -71,16 +71,6 @@ class DataLoader():
         if self.use_audio_feature == 1:
             self.feat_dim_aud = self.feat_h5_aud[self.videos[0]].shape[0] if 'mp1' in self.feat_h5_files[2] else self.feat_h5_aud['feats'][0].shape[0]
         if self.use_global_local_feature == 1:
-            # if self.use_long_range and self.use_short_range and self.use_local:
-            #     self.feat_dim_gl = self.feat_h5_gl[self.videos[0]].shape[0] if 'mp1' in self.feat_h5_files[3] else self.feat_h5_gl['feats'][0].shape[0]
-            # else:
-            #     self.feat_dim_gl = 0
-            #     if self.use_long_range:
-            #         self.feat_dim_gl += 300
-            #     if self.use_short_range:
-            #         self.feat_dim_gl += 400
-            #     if self.use_local:
-            #         self.feat_dim_gl += 1000
             self.feat_dim_gl = 0
             if self.use_long_range:
                 self.feat_dim_gl += 300
@@ -227,19 +217,6 @@ class DataLoader():
                 else:
                     loaded_data = torch.from_numpy(np.array(self.feat_h5_gl['feats'][self.update_index(video_id, self.feat_h5_files[3])]))
 
-                # if self.use_long_range and self.use_short_range and self.use_local:
-                #     global_local_feature = loaded_data
-                # else:
-                #     global_local_feature = torch.FloatTensor([])
-
-                #     if self.use_long_range:
-                #         global_local_feature = torch.cat((global_local_feature, loaded_data[:300]), -1)
-
-                #     if self.use_short_range:
-                #         global_local_feature = torch.cat((global_local_feature, loaded_data[300:(300+400)]), -1)
-
-                #     if self.use_local:
-                #         global_local_feature = torch.cat((global_local_feature, loaded_data[(300+400):(300+400+1000)]), -1)
                 global_local_feature = torch.FloatTensor([])
 
                 if self.use_long_range:
