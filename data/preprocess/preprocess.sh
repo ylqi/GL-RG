@@ -113,9 +113,15 @@ func_compute_evalscores()
     {
         python compute_scores.py    --cocofmt_file output/metadata/${DATASET}_${SPLIT}_cocofmt.json\
                                     --output_pkl output/metadata/${DATASET}_${SPLIT}_evalscores.pkl\
+                                    --seq_per_img ${SEQ_PER_IMG} \
                                     --remove_in_ref
     }
     DATASET="msvd"
+    if [ "$DATASET" == "msvd" ]; then 
+        SEQ_PER_IMG=17
+    else
+        SEQ_PER_IMG=20
+    fi
     SPLIT="train"   && echo "pre-compute evaluation scores (BLEU_4, CIDEr, METEOR, ROUGE_L) "${SPLIT} && func_compute_evalscores_thread
     SPLIT="val"     && echo "pre-compute evaluation scores (BLEU_4, CIDEr, METEOR, ROUGE_L) "${SPLIT} && func_compute_evalscores_thread
     SPLIT="test"    && echo "pre-compute evaluation scores (BLEU_4, CIDEr, METEOR, ROUGE_L) "${SPLIT} && func_compute_evalscores_thread
